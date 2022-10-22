@@ -5,6 +5,7 @@
  */
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <anthy/anthy.h>
@@ -12,13 +13,20 @@
 
 static void (*logger)(int lv, const char *str);
 static int current_level = 1;
+static int buffer_size = 256;
+char *log_buffer = NULL;
 
 void
 anthy_do_set_logger(void (*fn)(int lv, const char *str), int lv)
 {
   current_level = lv;
   logger = fn;
-  /* to be implemented */
+  if (logger != NULL && log_buffer == NULL) {
+    log_buffer = malloc(sizeof(char) * buffer_size);
+  } else if (logger == NULL && log_buffer != NULL) {
+    free(log_buffer);
+    log_buffer = NULL;
+  }
 }
 
 static void
@@ -27,8 +35,13 @@ do_log(int lv, const char *str, va_list arg)
   if (lv < current_level) {
     return ;
   }
-  fprintf(stderr, "Anthy: ");
-  vfprintf(stderr, str, arg);
+  if (logger) {
+    vsnprintf(log_buffer, 256, str, arg);
+    logger(lv, log_buffer);
+  } else {
+    fprintf(stderr, "Anthy: ");
+    vfprintf(stderr, str, arg);
+  }
 }
 
 void
