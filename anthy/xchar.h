@@ -1,6 +1,6 @@
 /* 各種カナや文字のコードと識別関数 */
 #ifndef _xchar_h_included_
-#define _xhcar_h_included_
+#define _xchar_h_included_
 
 #include <anthy/xstr.h>
 
