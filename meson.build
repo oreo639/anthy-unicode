@@ -1,10 +1,17 @@
 project('anthy-unicode',
   ['c'],
-  version: '1.0.0.@0@'.format(run_command('date', '+%Y%m%d',
+  version: '1.0.0.@0@'.format(run_command('sh', '-c',
+                                          'if [ -f .datestamp ];'+
+                                          'then cat .datestamp;'+
+                                          'else date +%Y%m%d; fi',
                                           check: true).stdout().strip()),
   license: 'LGPL2.1+',
   meson_version: '>= 0.59',
 )
+
+meson.add_dist_script('sh', '-c',
+                      'echo @0@>"$MESON_DIST_ROOT/.datestamp"'.format(
+                      meson.project_version().split('.')[-1]))
 
 cc = meson.get_compiler('c')
 
